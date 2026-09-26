@@ -1,4 +1,5 @@
-/* Power of 2 roster — one entry per CG (a pair of 2). Fill phone / dob / location / photo per member. */
+/* Phone and DOB are deliberately left blank here (this file is public); they live in data/CH details.xlsx.
+   Power of 2 roster — one entry per CG (a pair of 2). CG38–CG41 were unnumbered on the list: numbers are provisional. */
 window.CGS = [
   { cg:'CG1', governor:"Mummy Kiki", members:[ { name:"Nina", ch:"CH1", phone:'', dob:'', location:'', photo:'' }, { name:"Gifty", ch:"CH2", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG2', governor:"Mummy Kiki", members:[ { name:"Lucia", ch:"CH3", phone:'', dob:'', location:'', photo:'' }, { name:"Zifah", ch:"CH4", phone:'', dob:'', location:'', photo:'' } ] },
@@ -21,13 +22,13 @@ window.CGS = [
   { cg:'CG19', governor:"Dorcas L", members:[ { name:"Dorcas", ch:"CH37", phone:'', dob:'', location:'', photo:'' }, { name:"Rebecca", ch:"CH38", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG20', governor:"Dorcas L", members:[ { name:"Jonathan", ch:"CH39", phone:'', dob:'', location:'', photo:'' }, { name:"Rebecca", ch:"CH40", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG21', governor:"Johanna", members:[ { name:"Tina Andaful", ch:"CH41", phone:'', dob:'', location:'', photo:'' }, { name:"Famous Klutse", ch:"CH42", phone:'', dob:'', location:'', photo:'' } ] },
-  { cg:'CG22', governor:"Johanna", members:[ { name:"Nana Yaa", ch:"CH43", phone:'', dob:'', location:'', photo:'' }, { name:"Lp Johanna Agyeman", ch:"CH44", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG22', governor:"Johanna", members:[ { name:"Nana Yaa", ch:"CH43", phone:'', dob:'', location:'', photo:'' }, { name:"Lp Johanna", ch:"CH44", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG23', governor:"Lois", members:[ { name:"Raphael Kumah", ch:"CH45", phone:'', dob:'', location:'', photo:'' }, { name:"David Odoom", ch:"CH46", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG24', governor:"Lois", members:[ { name:"Vonzell Asante", ch:"CH47", phone:'', dob:'', location:'', photo:'' }, { name:"Michelle Erskine", ch:"CH48", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG25', governor:"Lois", members:[ { name:"Isabella Kabukuor Atrikpe", ch:"CH49", phone:'', dob:'', location:'', photo:'' }, { name:"Doreen Akapko", ch:"CH50", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG26', governor:"Lois", members:[ { name:"Lois Nterful", ch:"CH51", phone:'', dob:'', location:'', photo:'' }, { name:"Patience Nortey", ch:"CH52", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG27', governor:"Joanita", members:[ { name:"Portia Danquah", ch:"CH53", phone:'', dob:'', location:'', photo:'' }, { name:"Patricia Nunekpeku", ch:"CH54", phone:'', dob:'', location:'', photo:'' } ] },
-  { cg:'CG28', governor:"Joanita", members:[ { name:"Papa Yaw Ashun", ch:"CH55", phone:'', dob:'', location:'', photo:'' }, { name:"Ewuradjoa", ch:"CH56", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG28', governor:"Joanita", members:[ { name:"Papa Yaw Ashun", ch:"CH55", phone:'', dob:'', location:'', photo:'' }, { name:"Betty", ch:"CH56", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG29', governor:"Anne", members:[ { name:"Anne Wuni", ch:"CH57", phone:'', dob:'', location:'', photo:'' }, { name:"Leticia Ewudzi", ch:"CH58", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG30', governor:"Anne", members:[ { name:"Cynthia Tetteh", ch:"CH59", phone:'', dob:'', location:'', photo:'' }, { name:"Esther Donkor", ch:"CH60", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG31', governor:"Lucia", members:[ { name:"Eyram Edah", ch:"CH61", phone:'', dob:'', location:'', photo:'' }, { name:"Wilhermina Narh", ch:"CH62", phone:'', dob:'', location:'', photo:'' } ] },
@@ -37,4 +38,8 @@ window.CGS = [
   { cg:'CG35', governor:"Hannah-Joy", members:[ { name:"Sarah", ch:"CH68", phone:'', dob:'', location:'', photo:'' }, { name:"Johnny", ch:"CH69", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG36', governor:"Hannah-Joy", members:[ { name:"Daniel", ch:"CH70", phone:'', dob:'', location:'', photo:'' }, { name:"Elvis", ch:"CH71", phone:'', dob:'', location:'', photo:'' } ] },
   { cg:'CG37', governor:"Hannah-Joy", members:[ { name:"Oheema", ch:"CH72", phone:'', dob:'', location:'', photo:'' }, { name:"Adom", ch:"CH73", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG38', governor:"Aseda", members:[ { name:"Honesty", ch:"CH74", phone:'', dob:'', location:'', photo:'' }, { name:"Joana Shiela", ch:"CH75", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG39', governor:"Michelle", members:[ { name:"Michelle", ch:"CH76", phone:'', dob:'', location:'', photo:'' }, { name:"", ch:"", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG40', governor:"Celine", members:[ { name:"Celine", ch:"CH77", phone:'', dob:'', location:'', photo:'' }, { name:"", ch:"", phone:'', dob:'', location:'', photo:'' } ] },
+  { cg:'CG41', governor:"Janet Thomas", members:[ { name:"Janet", ch:"CH78", phone:'', dob:'', location:'', photo:'' }, { name:"", ch:"", phone:'', dob:'', location:'', photo:'' } ] },
 ];
