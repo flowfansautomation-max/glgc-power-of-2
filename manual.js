@@ -13,7 +13,8 @@ window.MANUAL_REPORTS = [
   { date: '2026-09-25', cg: 'CG23', type: 'Friday Outreach', value: 3, note: 'David & Raphael' },
   { date: '2026-09-25', cg: 'CG29', type: 'Friday Outreach', value: 7, note: 'Anne & Cynthia (credited to Anne\'s CG)' },
   { date: '2026-09-25', cg: 'CG40', type: 'Friday Outreach', value: 3, note: 'Celine & Isaac' },
-  { date: '2026-09-25', cg: 'CG19', type: 'Friday Outreach', value: 3, note: 'Dorcas & Rebecca' }
+  { date: '2026-09-25', cg: 'CG19', type: 'Friday Outreach', value: 3, note: 'Dorcas & Rebecca' },
+  { date: '2026-09-25', cg: 'CG20', type: 'Friday Outreach', value: 4, note: 'Jonathan & Rebecca (late report, counted per user)' },
+  { date: '2026-09-25', cg: 'CG37', type: 'Friday Outreach', value: 2, note: 'Ohemaa & Adom (late report, counted per user)' }
   // Not placed (not on the CG list): Elizabeth & Favour — 6 souls.
-  // Marked ❌ on the list but a report exists in the chat: CG20 Jonathan & Rebecca (4), CG37 Ohemaa & Adom (2).
 ];
