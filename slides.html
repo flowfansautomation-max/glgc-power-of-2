@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Power of 2</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css?v=2">
+  <script src="config.js?v=2"></script><script src="roster.js?v=2"></script><script src="data.js?v=2"></script>
+</head>
+<body>
+  <div class="deck" id="deck"></div>
+  <div class="ctl">
+    <button id="prev">‹ Prev</button>
+    <select id="jump"></select>
+    <button id="next">Next ›</button>
+    <span class="pos" id="pos"></span>
+  </div>
+
+<script>
+var valueLabels = { id:'valueLabels', afterDatasetsDraw:function (chart) {
+  var ctx = chart.ctx;
+  chart.data.datasets.forEach(function (ds, di) {
+    var meta = chart.getDatasetMeta(di); if (meta.hidden) return;
+    meta.data.forEach(function (bar, i) { var v = ds.data[i]; if (v == null) return;
+      ctx.save(); ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(v, bar.x, bar.y - 4); ctx.restore(); });
+  });
+}};
+function bar(canvas, labels, data, color) {
+  return new Chart(canvas, { type:'bar', plugins:[valueLabels],
+    data:{ labels:labels, datasets:[{ data:data, backgroundColor:color, borderRadius:4, maxBarThickness:70 }] },
+    options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{display:false} },
+      scales:{ x:{ ticks:{color:'#ddd',font:{size:13}}, grid:{display:false}, border:{color:'#fff'} },
+               y:{ display:false, beginAtZero:true, grace:'25%' } } } });
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
+function initials(n) { return n.split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase() || '?'; }
+function pic(m) {
+  if (m.photo) return '<img class="pic" src="' + esc(m.photo) + '" onerror="this.outerHTML=\'<div class=pic>' + initials(m.name) + '</div>\'">';
+  return '<div class="pic">' + initials(m.name) + '</div>';
+}
+function personCard(m, side) {
+  if (!m || !m.name) return '<div class="person ' + side + '"><div class="pic">?</div><div class="nm na">Not yet paired</div></div>';
+  return '<div class="person ' + side + '">' + pic(m) +
+    '<div class="nm">' + esc(m.name) + '</div><div class="ch">' + esc(m.ch) + '</div>' +
+    '<div class="dt"><b>Phone:</b> ' + (esc(m.phone) || '—') + '<br><b>DOB:</b> ' + (esc(m.dob) || '—') + '<br><b>Location:</b> ' + (esc(m.location) || '—') + '</div></div>';
+}
+function tick(v) { return v === true ? '✅' : v === false ? '❌' : '<span class="na">—</span>'; }
+
+P2.load(function (M) {
+  if (M.sample) { var b = document.createElement('div'); b.className = 'sample'; b.textContent = 'SAMPLE DATA — template preview'; document.body.appendChild(b); }
+  var deck = document.getElementById('deck'), slides = [], charts = [];
+  var W = M.weeks, labels = W.map(function (w) { return 'WK ' + w.wk; }), last = W[W.length - 1];
+
+  // ---- Page 1: stage counting ----
+  var S = window.STAGE || {};
+  var pics = (S.photos || []).slice(0, 6).map(function (p) { return '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">'; });
+  while (pics.length < 3) pics.push('<div class="ph">picture</div>');
+  slides.push({ title:'Stage counting', html:
+    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">' + esc(S.week || '') + '</div></div>' +
+    '<div class="stage"><div class="big"><div class="n">' + esc(S.count != null ? S.count : '—') + '</div><div class="t">counted on stage' + (S.note ? ' · ' + esc(S.note) : '') + '</div></div>' +
+    '<div class="pics">' + pics.join('') + '</div></div>' });
+
+  // ---- Page 2: weekend summary ----
+  var k = last ? last.key : null, n = M.cgs.length;
+  function tile(lab, val, note, c) { return '<div class="kpi" style="--kc:' + c + '"><div class="lab">' + lab + '</div><div class="val">' + val + '</div><div class="note">' + note + '</div></div>'; }
+  var byGov = {}; M.cgs.forEach(function (c) { var g = byGov[c.governor] || (byGov[c.governor] = { cgs:0, tue:0, mgs:0, fri:0, out:0, sun:0 }); g.cgs++;
+    ['tue','mgs','fri','out','sun'].forEach(function (f) { var v = k != null ? M.get(c.cg, k, f) : null; if (v === true) g[f]++; else if (typeof v === 'number') g[f] += v; }); });
+  slides.push({ title:'Weekend summary', html:
+    '<div class="head"><div class="name">Summary of the Weekend</div><div class="choir">' + (last ? 'Week ' + last.wk + ' · ' + esc(last.label) : '') + '</div><div class="gov">All ' + n + ' CGs · Power of 2</div></div>' +
+    '<div class="kpis">' +
+      tile('Tuesday &amp; Friday FLOW', k != null ? (M.total(k,'tue') + ' / ' + M.total(k,'fri')) : '—', 'CGs present · Tue / Fri', 'var(--green)') +
+      tile('Meeting God Service', k != null ? M.total(k,'mgs') : '—', 'of ' + n + ' CGs present', 'var(--blue)') +
+      tile('Saturday Outreaches', k != null ? M.total(k,'out') : '—', 'souls won · ' + (k != null ? M.reported(k,'out') : 0) + ' CGs reported', 'var(--pink)') +
+      tile('Sunday Attendance', k != null ? M.total(k,'sun') : '—', 'people brought · ' + (k != null ? M.reported(k,'sun') : 0) + ' CGs reported', 'var(--sun)') +
+    '</div>' +
+    '<div class="govtbl"><table><thead><tr><th>Governor</th><th>CGs</th><th>Tue FLOW</th><th>Meeting God</th><th>Fri FLOW</th><th>Souls</th><th>Sunday</th></tr></thead><tbody>' +
+      Object.keys(byGov).map(function (g) { var x = byGov[g]; return '<tr><td>' + esc(g) + '</td><td>' + x.cgs + '</td><td>' + x.tue + '</td><td>' + x.mgs + '</td><td>' + x.fri + '</td><td>' + x.out + '</td><td>' + x.sun + '</td></tr>'; }).join('') +
+      '<tr class="total"><td>Total</td><td>' + n + '</td><td>' + (k != null ? M.total(k,'tue') : 0) + '</td><td>' + (k != null ? M.total(k,'mgs') : 0) + '</td><td>' + (k != null ? M.total(k,'fri') : 0) + '</td><td>' + (k != null ? M.total(k,'out') : 0) + '</td><td>' + (k != null ? M.total(k,'sun') : 0) + '</td></tr>' +
+    '</tbody></table></div>' });
+
+  // ---- Page 3+: one per CG ----
+  M.cgs.forEach(function (c, i) {
+    var out = W.map(function (w) { return M.get(c.cg, w.key, 'out'); }), sun = W.map(function (w) { return M.get(c.cg, w.key, 'sun'); });
+    function cnt(f) { return W.filter(function (w) { return M.get(c.cg, w.key, f) === true; }).length; }
+    var rows = W.map(function (w) { return '<tr><td class="w">WK ' + w.wk + ' · ' + esc(w.label) + '</td><td>' + tick(M.get(c.cg, w.key, 'tue')) + '</td><td>' + tick(M.get(c.cg, w.key, 'mgs')) + '</td><td>' + tick(M.get(c.cg, w.key, 'fri')) + '</td></tr>'; }).join('');
+    slides.push({ title:c.cg + ' · ' + c.members.map(function (m) { return m.name || '?'; }).join(' & '), html:
+      personCard(c.members[0], 'l') + personCard(c.members[1], 'r') +
+      '<div class="head"><div class="name">Power of 2</div><div class="choir">' + esc(c.cg) + '</div><div class="gov">Governor: ' + esc(c.governor) + '</div></div>' +
+      '<div class="graphs">' +
+        '<div class="graph"><div class="cap"><span class="pill">Saturday Outreaches</span><span class="legend"><span><i class="sw" style="background:var(--pink)"></i> Souls won</span></span></div><div class="area"><canvas id="o' + i + '"></canvas></div></div>' +
+        '<div class="graph"><div class="cap"><span class="pill">Sunday Attendance</span><span class="legend"><span><i class="sw" style="background:var(--sun)"></i> People brought</span></span></div><div class="area"><canvas id="s' + i + '"></canvas></div></div>' +
+      '</div>' +
+      '<div class="flow"><table><thead><tr><th>Week</th><th>Tuesday FLOW</th><th>Meeting God Service</th><th>Friday FLOW</th></tr></thead><tbody>' + rows +
+        '<tr class="total"><td class="w">Total</td><td class="tot">' + cnt('tue') + ' / ' + W.length + '</td><td class="tot">' + cnt('mgs') + ' / ' + W.length + '</td><td class="tot">' + cnt('fri') + ' / ' + W.length + '</td></tr></tbody></table></div>',
+      draw:function () { charts.push(bar(document.getElementById('o' + i), labels, out, '#e2574c')); charts.push(bar(document.getElementById('s' + i), labels, sun, '#f5c518')); } });
+  });
+
+  deck.innerHTML = slides.map(function (s, i) { return '<section class="slide" id="sl' + i + '">' + s.html + '</section>'; }).join('');
+  var jump = document.getElementById('jump'); jump.innerHTML = slides.map(function (s, i) { return '<option value="' + i + '">' + (i + 1) + '. ' + esc(s.title) + '</option>'; }).join('');
+  var cur = -1, drawn = {};
+  function show(i) {
+    i = Math.max(0, Math.min(slides.length - 1, i)); if (i === cur) return;
+    if (cur >= 0) document.getElementById('sl' + cur).classList.remove('on');
+    cur = i; document.getElementById('sl' + i).classList.add('on'); jump.value = i;
+    document.getElementById('pos').textContent = (i + 1) + ' / ' + slides.length;
+    if (slides[i].draw && !drawn[i]) { drawn[i] = 1; slides[i].draw(); }
+    location.hash = i + 1;
+  }
+  document.getElementById('prev').onclick = function () { show(cur - 1); };
+  document.getElementById('next').onclick = function () { show(cur + 1); };
+  jump.onchange = function () { show(+jump.value); };
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === ' ') show(cur + 1); if (e.key === 'ArrowLeft') show(cur - 1); });
+  window.addEventListener('hashchange', function () { show((parseInt(location.hash.slice(1), 10) || 1) - 1); });
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+}, function (e) { document.body.innerHTML = '<p style="padding:20px;color:#f88">' + e.message + '</p>'; });
+</script>
+</body>
+</html>
