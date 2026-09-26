@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Power of 2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=5">
-  <script src="config.js?v=5"></script><script src="roster.js?v=5"></script><script src="data.js?v=5"></script>
+  <link rel="stylesheet" href="style.css?v=6">
+  <script src="config.js?v=6"></script><script src="roster.js?v=6"></script><script src="data.js?v=6"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -44,7 +44,7 @@ function personCard(m, side) {
   if (!m || !m.name) return '<div class="person ' + side + '"><div class="pic">?</div><div class="nm na">Not yet paired</div></div>';
   return '<div class="person ' + side + '">' + pic(m) +
     '<div class="nm">' + esc(m.name) + '</div><div class="ch">' + esc(m.ch) + '</div>' +
-    '<div class="dt"><b>Phone:</b> ' + (esc(m.phone) || '—') + '<br><b>DOB:</b> ' + (esc(m.dob) || '—') + '<br><b>Location:</b> ' + (esc(m.location) || '—') + '</div></div>';
+    '<div class="dt"><b>Location:</b> ' + (esc(m.location) || '—') + '</div></div>';
 }
 function tick(v) { return v === true ? '✅' : v === false ? '❌' : '<span class="na">—</span>'; }
 
