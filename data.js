@@ -37,7 +37,7 @@ window.P2 = (function () {
       var d = new Date(sun); d.setDate(d.getDate() - 7 * w);
       CGS.forEach(function (c, i) {
         var s = i * 17 + w * 101;
-        function who(seed, p) { return c.members.filter(function (m, j) { return m.ch && rnd(seed + j * 7) > p; }).map(function (m) { return m.ch; }).join(', ') || 'None'; }
+        function who(seed, p) { return c.members.filter(function (m) { return m.ch; }).map(function (m, j) { return m.ch + ':' + (rnd(seed + j * 7) > p ? 'Y' : 'N'); }).join(';'); }
         if (rnd(s) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Tuesday FLOW', value: who(s + 1, 0.3) });
         if (rnd(s + 2) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Meeting God Service', value: who(s + 3, 0.35) });
         if (rnd(s + 4) > 0.2) rows.push({ date: d, cg: c.cg, type: 'Friday FLOW', value: who(s + 5, 0.4) });
@@ -71,10 +71,14 @@ window.P2 = (function () {
 
   // FLOW / Meeting God reports list WHO attended: "CH1, CH2", "CH1", or "None". Outreach & Sunday are numbers.
   function present(cg, v) {
-    var s = String(v == null ? '' : v).toUpperCase(), out = {};
-    cg.members.forEach(function (m) { if (!m.ch) return;
-      out[m.ch] = /^(YES|Y|TRUE|BOTH|ALL)$/.test(s.trim()) ? true : new RegExp('\\b' + m.ch + '\\b').test(s); });
-    return out;                                                    // {CH1:true, CH2:false} — the report itself counts as "reported"
+    var s = String(v == null ? '' : v).toUpperCase().trim(), out = {};
+    if (/:/.test(s)) {                                              // "CH1:Y;CH2:N" — only the people answered for
+      s.split(/[;,]\s*/).forEach(function (p) { var m = /^(CH\d+):([YN])$/.exec(p.trim()); if (m) out[m[1]] = m[2] === 'Y'; });
+      return out;
+    }
+    cg.members.forEach(function (m) { if (!m.ch) return;             // old style: "CH1, CH2" / "None" / "Yes"
+      out[m.ch] = /^(YES|Y|TRUE|BOTH|ALL)$/.test(s) ? true : new RegExp('\\b' + m.ch + '\\b').test(s); });
+    return out;
   }
   var PERSON = { tue: 1, mgs: 1, fri: 1 };
   function build(rows, isSample) {
@@ -83,7 +87,8 @@ window.P2 = (function () {
       var f = TYPES[r.type], c = byCg[r.cg]; if (!f || !c) return;
       var sun = sundayOf(r.date), k = sun.getTime(); weeks[k] = sun;
       var dd = data[r.cg] || (data[r.cg] = {}); var wk = dd[k] || (dd[k] = {});
-      wk[f] = PERSON[f] ? present(c, r.value) : num(r.value);          // latest report wins (rows are in time order)
+      if (PERSON[f]) { var p = present(c, r.value), cur = wk[f] || (wk[f] = {}); Object.keys(p).forEach(function (ch) { cur[ch] = p[ch]; }); }   // per person, latest wins
+      else wk[f] = num(r.value);                                        // latest report wins (rows are in time order)
     });
     var weekList = Object.keys(weeks).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return { key: k, date: weeks[k], wk: isoWeek(weeks[k]), label: label(weeks[k]) }; });
     function get(cg, k, f) { var dd = data[cg] && data[cg][k]; return dd && dd[f] !== undefined ? dd[f] : null; }   // number | {CH:bool} | null
