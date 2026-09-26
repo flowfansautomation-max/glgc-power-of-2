@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Power of 2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=6">
-  <script src="config.js?v=6"></script><script src="roster.js?v=6"></script><script src="data.js?v=6"></script>
+  <link rel="stylesheet" href="style.css?v=7">
+  <script src="config.js?v=7"></script><script src="roster.js?v=7"></script><script src="data.js?v=7"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -69,7 +69,7 @@ P2.load(function (M) {
       return x ? '<td>' + x.podcast + '</td><td>' + x.salvation + '</td><td class="t">' + t + '</td>' : '<td class="na">—</td><td class="na">—</td><td class="na">—</td>'; }).join('');
     return '<tr><td class="w">' + esc(w.date) + '</td>' + cells + '<td class="g">' + g + '</td></tr>'; }).join('');
   slides.push({ title:'Stage counting', html:
-    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">Ushers Count' + (latest.date ? ' · latest ' + esc(latest.date) : '') + '</div></div>' +
+    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">Ushers Count</div></div>' +
     '<div class="stage2">' +
       '<div class="gwrap"><div class="legend">' + legend + '</div><div class="area"><canvas id="stagechart"></canvas></div></div>' +
       '<div class="pics">' + pics.join('') + '</div>' +

@@ -51,12 +51,12 @@ html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica
 .na { color:#555; }
 
 /* page 1 */
-.stage2 { position:absolute; top:17vh; left:3vw; right:3vw; bottom:1.5vh; display:grid; grid-template-columns:1fr 30vw; grid-template-rows:auto 1fr; gap:1.5vh 2vw; }
+.stage2 { position:absolute; top:19vh; left:3vw; right:3vw; bottom:1.5vh; display:grid; grid-template-columns:1fr 30vw; grid-template-rows:auto 1fr; gap:1.5vh 2vw; }
 .stage2 .gwrap { display:flex; flex-direction:column; height:44vh; }
 .stage2 .gwrap .area { flex:1; position:relative; min-height:0; }
 .stage2 .pics { display:grid; grid-template-columns:1fr 1fr; gap:1vw; align-content:start; }
 .pstream { display:flex; flex-direction:column; gap:.8vh; }
-.pstream .plab { font-weight:bold; font-size:1.8vh; text-align:center; letter-spacing:.05em; }
+.pstream .plab { font-weight:bold; font-size:1.8vh; text-align:center; letter-spacing:.05em; margin-bottom:1.2vh; }
 .stage2 .pics img, .stage2 .pics .ph { width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:2px solid #333; background:#111; display:flex; align-items:center; justify-content:center; color:#555; font-size:1.6vh; }
 .stbl { grid-column:1 / -1; overflow:auto; }
 .stbl table { border-collapse:collapse; margin:0 auto; font-size:1.8vh; }
