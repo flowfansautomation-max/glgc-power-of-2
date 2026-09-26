@@ -1,12 +1,14 @@
 /* Data layer for the Power of 2 presentation. Sample data until config.js has a SHEET_ID. */
 
-/* ---- Page 1: typed by hand each week ---- */
+/* ---- Page 1: Ushers Count, typed by hand each week ----
+   One entry per Sunday. Each stream (HGE, Experience) has its Podcast and Salvation counts.
+   Leave a stream out (or null) if its count has not come in yet. photos = that Sunday's on-stage pictures. */
 window.STAGE = {
-  title: 'Ushers Count',
-  date: '20th September 2026',
-  counts: [ { label: 'Podcast', value: 572 }, { label: 'Salvation', value: 406 } ],   // add more lines if the count changes
-  total: 978,
-  photos: [ 'photos/stage-1.jpg', 'photos/stage-2.jpg', 'photos/stage-3.jpg' ]   // up to 6 on-stage pictures
+  streams: ['HGE', 'Experience'],
+  weeks: [
+    { date: '20 Sep 2026', HGE: null, Experience: { podcast: 572, salvation: 406 },
+      photos: [ 'photos/stage-2026-09-20-1.jpg', 'photos/stage-2026-09-20-2.jpg', 'photos/stage-2026-09-20-3.jpg' ] }
+  ]
 };
 
 window.P2 = (function () {

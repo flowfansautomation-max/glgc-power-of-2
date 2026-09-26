@@ -47,17 +47,17 @@ html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica
 .na { color:#555; }
 
 /* page 1 */
-.stage { position:absolute; top:19vh; left:3vw; right:3vw; bottom:4vh; display:grid; grid-template-columns:34vw 1fr; gap:3vw; align-items:center; }
-.counts { display:flex; flex-direction:column; gap:2.2vh; }
-.line { display:flex; align-items:center; gap:1.2vw; font-size:4.2vh; font-weight:bold; }
-.line .sq { width:3vh; height:3vh; border-radius:.5vh; flex:none; }
-.line .sq.y { background:#f5c518; } .line .sq.r { background:#ff0000; }
-.line .lab { color:#ddd; }
-.line .v { color:var(--gold); margin-left:auto; font-variant-numeric:tabular-nums; }
-.line.total { border-top:2px solid #444; padding-top:2.2vh; margin-top:1vh; font-size:5.6vh; }
-.line.total .v { color:#fff; }
-.stage .pics { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2vw; align-content:center; }
-.stage .pics img, .stage .pics .ph { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:10px; border:2px solid #333; background:#111; display:flex; align-items:center; justify-content:center; color:#555; font-size:1.8vh; }
+.stage2 { position:absolute; top:17vh; left:3vw; right:3vw; bottom:1.5vh; display:grid; grid-template-columns:1fr 26vw; grid-template-rows:auto 1fr; gap:1.5vh 2vw; }
+.stage2 .gwrap { display:flex; flex-direction:column; height:44vh; }
+.stage2 .gwrap .area { flex:1; position:relative; min-height:0; }
+.stage2 .pics { display:grid; grid-template-columns:1fr 1fr; gap:1vw; align-content:start; }
+.stage2 .pics img, .stage2 .pics .ph { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; border:2px solid #333; background:#111; display:flex; align-items:center; justify-content:center; color:#555; font-size:1.6vh; }
+.stbl { grid-column:1 / -1; overflow:auto; }
+.stbl table { border-collapse:collapse; margin:0 auto; font-size:1.8vh; }
+.stbl th { color:#000; background:var(--gold); padding:.5vh 1.3vw; font-size:1.4vh; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+.stbl td { padding:.4vh 1.3vw; border-bottom:1px solid #222; text-align:center; }
+.stbl td.w { text-align:left; font-weight:bold; white-space:nowrap; }
+.stbl td.t { font-weight:bold; } .stbl td.g { color:var(--gold); font-weight:bold; }
 
 /* page 2 */
 .kpis { position:absolute; top:22vh; left:3vw; right:3vw; display:grid; grid-template-columns:repeat(4,1fr); gap:2vw; }

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Power of 2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=3">
-  <script src="config.js?v=3"></script><script src="roster.js?v=3"></script><script src="data.js?v=3"></script>
+  <link rel="stylesheet" href="style.css?v=4">
+  <script src="config.js?v=4"></script><script src="roster.js?v=4"></script><script src="data.js?v=4"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -53,16 +53,34 @@ P2.load(function (M) {
   var deck = document.getElementById('deck'), slides = [], charts = [];
   var W = M.weeks, labels = W.map(function (w) { return 'WK ' + w.wk; }), last = W[W.length - 1];
 
-  // ---- Page 1: stage counting (Ushers Count) ----
-  var S = window.STAGE || {};
-  var pics = (S.photos || []).slice(0, 6).map(function (p) { return '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">'; });
-  while (pics.length < 3) pics.push('<div class="ph">picture</div>');
-  var lines = (S.counts || []).map(function (c) { return '<div class="line"><span class="sq y"></span><span class="lab">' + esc(c.label) + ':</span><span class="v">' + esc(c.value) + '</span></div>'; }).join('');
+  // ---- Page 1: stage counting (Ushers Count), week by week ----
+  var S = window.STAGE || { streams: [], weeks: [] }, SW = S.weeks || [], latest = SW[SW.length - 1] || {};
+  var SC = { HGE: ['#1f5fff', '#8fb0ff'], Experience: ['#f5c518', '#fff0a8'] };
+  function tot(w, st) { var x = w[st]; return x ? (x.podcast || 0) + (x.salvation || 0) : null; }
+  var pics = (latest.photos || []).slice(0, 4).map(function (p) { return '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">'; });
+  while (pics.length < 2) pics.push('<div class="ph">picture</div>');
+  var legend = S.streams.map(function (st) { var c = SC[st] || ['#aaa', '#ddd'];
+    return '<span><i class="sw" style="background:' + c[0] + '"></i> ' + esc(st) + ' · Podcast</span><span><i class="sw" style="background:' + c[1] + '"></i> ' + esc(st) + ' · Salvation</span>'; }).join('');
+  var trows = SW.map(function (w) { var g = 0;
+    var cells = S.streams.map(function (st) { var x = w[st], t = tot(w, st); if (t != null) g += t;
+      return x ? '<td>' + x.podcast + '</td><td>' + x.salvation + '</td><td class="t">' + t + '</td>' : '<td class="na">—</td><td class="na">—</td><td class="na">—</td>'; }).join('');
+    return '<tr><td class="w">' + esc(w.date) + '</td>' + cells + '<td class="g">' + g + '</td></tr>'; }).join('');
   slides.push({ title:'Stage counting', html:
-    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">' + esc(S.title || 'Ushers Count') + ' · ' + esc(S.date || '') + '</div></div>' +
-    '<div class="stage"><div class="counts">' + lines +
-      '<div class="line total"><span class="sq r"></span><span class="lab">TOTAL:</span><span class="v">' + esc(S.total != null ? S.total : '—') + '</span></div></div>' +
-    '<div class="pics">' + pics.join('') + '</div></div>' });
+    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">Ushers Count' + (latest.date ? ' · latest ' + esc(latest.date) : '') + '</div></div>' +
+    '<div class="stage2">' +
+      '<div class="gwrap"><div class="legend">' + legend + '</div><div class="area"><canvas id="stagechart"></canvas></div></div>' +
+      '<div class="pics">' + pics.join('') + '</div>' +
+      '<div class="stbl"><table><thead><tr><th>Sunday</th>' + S.streams.map(function (st) { return '<th>' + esc(st) + ' Podcast</th><th>' + esc(st) + ' Salvation</th><th>' + esc(st) + ' Total</th>'; }).join('') + '<th>Grand total</th></tr></thead><tbody>' + trows + '</tbody></table></div>' +
+    '</div>',
+    draw:function () {
+      var labels = SW.map(function (w) { return w.date; }), ds = [];
+      S.streams.forEach(function (st) { var c = SC[st] || ['#aaa', '#ddd'];
+        ds.push({ label: st + ' Podcast', data: SW.map(function (w) { return w[st] ? w[st].podcast : null; }), backgroundColor: c[0], borderRadius: 4, maxBarThickness: 60 });
+        ds.push({ label: st + ' Salvation', data: SW.map(function (w) { return w[st] ? w[st].salvation : null; }), backgroundColor: c[1], borderRadius: 4, maxBarThickness: 60 }); });
+      charts.push(new Chart(document.getElementById('stagechart'), { type:'bar', plugins:[valueLabels], data:{ labels:labels, datasets:ds },
+        options:{ responsive:true, maintainAspectRatio:false, animation:false, plugins:{ legend:{display:false} },
+          scales:{ x:{ ticks:{color:'#ddd',font:{size:13}}, grid:{display:false}, border:{color:'#fff'} }, y:{ display:false, beginAtZero:true, grace:'25%' } } } }));
+    } });
 
   // ---- Page 2: weekend summary ----
   var k = last ? last.key : null, n = M.cgs.length;
