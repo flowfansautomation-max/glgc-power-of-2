@@ -13,7 +13,7 @@ window.STAGE = {
 
 window.P2 = (function () {
   var CFG = window.P2_CONFIG, CGS = window.CGS;
-  var TYPES = { 'Tuesday FLOW': 'tue', 'Meeting God Service': 'mgs', 'Friday FLOW': 'fri', 'Saturday Outreach': 'out', 'Sunday Attendance': 'sun' };
+  var TYPES = { 'Tuesday FLOW': 'tue', 'Meeting God Service': 'mgs', 'Friday FLOW': 'fri', 'Saturday Outreach': 'out', 'Friday Outreach': 'out', 'Sunday Attendance': 'sun' };
 
   function parseDate(v) {
     if (v == null || v === '') return null;
@@ -101,9 +101,15 @@ window.P2 = (function () {
     return { sample: !!isSample, weeks: weekList, cgs: CGS, people: people, get: get, person: person, total: total, reported: reported, defaulters: defaulters };
   }
 
+  // rows typed by hand in manual.js (used before the forms went live, and merged in afterwards)
+  function manual() {
+    return (window.MANUAL_REPORTS || []).map(function (r) { return { date: parseDate(r.date), cg: String(r.cg).toUpperCase(), type: r.type, value: r.value }; })
+      .filter(function (r) { return r.date && r.cg; });
+  }
   function load(cb, onErr) {
-    if (!CFG.SHEET_ID) return cb(build(sample(), true));
-    fetchSheet().then(function (rows) { cb(build(rows, false)); }).catch(onErr || function () {});
+    var man = manual();
+    if (!CFG.SHEET_ID) return cb(man.length ? build(man, false) : build(sample(), true));
+    fetchSheet().then(function (rows) { cb(build(man.concat(rows), false)); }).catch(onErr || function () {});
   }
   return { load: load };
 })();
