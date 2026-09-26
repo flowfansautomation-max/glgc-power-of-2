@@ -2,12 +2,12 @@
 
 /* ---- Page 1: Ushers Count, typed by hand each week ----
    One entry per Sunday. Each stream (HGE, Experience) has its Podcast and Salvation counts.
-   Leave a stream out (or null) if its count has not come in yet. photos = that Sunday's on-stage pictures. */
+   Leave a stream out (or null) if its count has not come in yet. photos = 3 on-stage pictures per stream. */
 window.STAGE = {
   streams: ['HGE', 'Experience'],
   weeks: [
     { date: '20 Sep 2026', HGE: null, Experience: { podcast: 572, salvation: 406 },
-      photos: [ 'photos/stage-2026-09-20-1.jpg', 'photos/stage-2026-09-20-2.jpg', 'photos/stage-2026-09-20-3.jpg' ] }
+      photos: { HGE: [], Experience: [ 'photos/stage-2026-09-20-exp-1.jpg', 'photos/stage-2026-09-20-exp-2.jpg', 'photos/stage-2026-09-20-exp-3.jpg' ] } }
   ]
 };
 
@@ -37,9 +37,10 @@ window.P2 = (function () {
       var d = new Date(sun); d.setDate(d.getDate() - 7 * w);
       CGS.forEach(function (c, i) {
         var s = i * 17 + w * 101;
-        if (rnd(s) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Tuesday FLOW', value: rnd(s + 1) > 0.3 ? 'Yes' : 'No' });
-        if (rnd(s + 2) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Meeting God Service', value: rnd(s + 3) > 0.35 ? 'Yes' : 'No' });
-        if (rnd(s + 4) > 0.2) rows.push({ date: d, cg: c.cg, type: 'Friday FLOW', value: rnd(s + 5) > 0.4 ? 'Yes' : 'No' });
+        function who(seed, p) { return c.members.filter(function (m, j) { return m.ch && rnd(seed + j * 7) > p; }).map(function (m) { return m.ch; }).join(', ') || 'None'; }
+        if (rnd(s) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Tuesday FLOW', value: who(s + 1, 0.3) });
+        if (rnd(s + 2) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Meeting God Service', value: who(s + 3, 0.35) });
+        if (rnd(s + 4) > 0.2) rows.push({ date: d, cg: c.cg, type: 'Friday FLOW', value: who(s + 5, 0.4) });
         if (rnd(s + 6) > 0.25) rows.push({ date: d, cg: c.cg, type: 'Saturday Outreach', value: Math.round(rnd(s + 7) * 6) });
         if (rnd(s + 8) > 0.15) rows.push({ date: d, cg: c.cg, type: 'Sunday Attendance', value: Math.round(rnd(s + 9) * 9) });
       });
@@ -68,19 +69,31 @@ window.P2 = (function () {
     });
   }
 
+  // FLOW / Meeting God reports list WHO attended: "CH1, CH2", "CH1", or "None". Outreach & Sunday are numbers.
+  function present(cg, v) {
+    var s = String(v == null ? '' : v).toUpperCase(), out = {};
+    cg.members.forEach(function (m) { if (!m.ch) return;
+      out[m.ch] = /^(YES|Y|TRUE|BOTH|ALL)$/.test(s.trim()) ? true : new RegExp('\\b' + m.ch + '\\b').test(s); });
+    return out;                                                    // {CH1:true, CH2:false} — the report itself counts as "reported"
+  }
+  var PERSON = { tue: 1, mgs: 1, fri: 1 };
   function build(rows, isSample) {
-    var weeks = {}, data = {};
+    var weeks = {}, data = {}, byCg = {}; CGS.forEach(function (c) { byCg[c.cg] = c; });
     rows.forEach(function (r) {
-      var f = TYPES[r.type]; if (!f) return;
+      var f = TYPES[r.type], c = byCg[r.cg]; if (!f || !c) return;
       var sun = sundayOf(r.date), k = sun.getTime(); weeks[k] = sun;
-      var d = data[r.cg] || (data[r.cg] = {}); var wk = d[k] || (d[k] = {});
-      wk[f] = (f === 'out' || f === 'sun') ? num(r.value) : yes(r.value);     // latest report wins (rows are in time order)
+      var dd = data[r.cg] || (data[r.cg] = {}); var wk = dd[k] || (dd[k] = {});
+      wk[f] = PERSON[f] ? present(c, r.value) : num(r.value);          // latest report wins (rows are in time order)
     });
     var weekList = Object.keys(weeks).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return { key: k, date: weeks[k], wk: isoWeek(weeks[k]), label: label(weeks[k]) }; });
-    function get(cg, k, f) { var d = data[cg] && data[cg][k]; return d && d[f] !== undefined ? d[f] : null; }
-    function total(k, f) { var s = 0; CGS.forEach(function (c) { var v = get(c.cg, k, f); if (typeof v === 'number') s += v; else if (v === true) s += 1; }); return s; }
-    function reported(k, f) { return CGS.filter(function (c) { return get(c.cg, k, f) !== null; }).length; }
-    return { sample: !!isSample, weeks: weekList, cgs: CGS, get: get, total: total, reported: reported };
+    function get(cg, k, f) { var dd = data[cg] && data[cg][k]; return dd && dd[f] !== undefined ? dd[f] : null; }   // number | {CH:bool} | null
+    function person(cg, k, f, ch) { var v = get(cg, k, f); return v && typeof v === 'object' ? !!v[ch] : null; }   // true/false, null = not reported
+    function total(k, f) { var s = 0; CGS.forEach(function (c) { var v = get(c.cg, k, f); if (typeof v === 'number') s += v;
+      else if (v) Object.keys(v).forEach(function (ch) { if (v[ch]) s++; }); }); return s; }                     // people present, or souls/people brought
+    function reported(k, f) { return CGS.filter(function (c) { return get(c.cg, k, f) !== null; }); }
+    function defaulters(k, f) { return CGS.filter(function (c) { return get(c.cg, k, f) === null; }); }
+    var people = 0; CGS.forEach(function (c) { c.members.forEach(function (m) { if (m.ch) people++; }); });
+    return { sample: !!isSample, weeks: weekList, cgs: CGS, people: people, get: get, person: person, total: total, reported: reported, defaulters: defaulters };
   }
 
   function load(cb, onErr) {

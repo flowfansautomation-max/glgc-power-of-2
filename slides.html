@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Power of 2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=4">
-  <script src="config.js?v=4"></script><script src="roster.js?v=4"></script><script src="data.js?v=4"></script>
+  <link rel="stylesheet" href="style.css?v=5">
+  <script src="config.js?v=5"></script><script src="roster.js?v=5"></script><script src="data.js?v=5"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -57,8 +57,11 @@ P2.load(function (M) {
   var S = window.STAGE || { streams: [], weeks: [] }, SW = S.weeks || [], latest = SW[SW.length - 1] || {};
   var SC = { HGE: ['#1f5fff', '#8fb0ff'], Experience: ['#f5c518', '#fff0a8'] };
   function tot(w, st) { var x = w[st]; return x ? (x.podcast || 0) + (x.salvation || 0) : null; }
-  var pics = (latest.photos || []).slice(0, 4).map(function (p) { return '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">'; });
-  while (pics.length < 2) pics.push('<div class="ph">picture</div>');
+  var ph = latest.photos || {}; if (Array.isArray(ph)) ph = { Experience: ph };
+  var pics = S.streams.map(function (st) { var list = (ph[st] || []).slice(0, 3);
+    while (list.length < 3) list.push(null);
+    return '<div class="pstream"><div class="plab" style="color:' + (SC[st] ? SC[st][0] : '#ccc') + '">' + esc(st) + '</div>' + list.map(function (p) {
+      return p ? '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">' : '<div class="ph">picture</div>'; }).join('') + '</div>'; });
   var legend = S.streams.map(function (st) { var c = SC[st] || ['#aaa', '#ddd'];
     return '<span><i class="sw" style="background:' + c[0] + '"></i> ' + esc(st) + ' · Podcast</span><span><i class="sw" style="background:' + c[1] + '"></i> ' + esc(st) + ' · Salvation</span>'; }).join('');
   var trows = SW.map(function (w) { var g = 0;
@@ -83,28 +86,45 @@ P2.load(function (M) {
     } });
 
   // ---- Page 2: weekend summary ----
-  var k = last ? last.key : null, n = M.cgs.length;
-  function tile(lab, val, note, c) { return '<div class="kpi" style="--kc:' + c + '"><div class="lab">' + lab + '</div><div class="val">' + val + '</div><div class="note">' + note + '</div></div>'; }
-  var byGov = {}; M.cgs.forEach(function (c) { var g = byGov[c.governor] || (byGov[c.governor] = { cgs:0, tue:0, mgs:0, fri:0, out:0, sun:0 }); g.cgs++;
-    ['tue','mgs','fri','out','sun'].forEach(function (f) { var v = k != null ? M.get(c.cg, k, f) : null; if (v === true) g[f]++; else if (typeof v === 'number') g[f] += v; }); });
+  var k = last ? last.key : null, n = M.cgs.length, np = M.people;
+  var ITEMS = [
+    { f:'tue', lab:'Tuesday FLOW', c:'var(--green)', person:true },
+    { f:'mgs', lab:'Meeting God Service', c:'var(--blue)', person:true },
+    { f:'fri', lab:'Friday FLOW', c:'var(--green)', person:true },
+    { f:'out', lab:'Saturday Outreaches', c:'var(--pink)', unit:'souls won' },
+    { f:'sun', lab:'Sunday Attendance', c:'var(--sun)', unit:'people brought' }
+  ];
+  function tile(it) {
+    if (k == null) return '<div class="kpi" style="--kc:' + it.c + '"><div class="lab">' + it.lab + '</div><div class="val">—</div></div>';
+    var rep = M.reported(k, it.f).length, def = n - rep;
+    var main = it.person ? M.total(k, it.f) + '<small> / ' + np + '</small>' : M.total(k, it.f);
+    var sub = it.person ? 'CHs present' : it.unit;
+    return '<div class="kpi" style="--kc:' + it.c + '"><div class="lab">' + it.lab + '</div><div class="val">' + main + '</div><div class="note">' + sub + '</div>' +
+      '<div class="rep"><span class="ok">' + rep + ' CGs reported</span><span class="bad">' + def + ' not reported</span></div></div>';
+  }
   slides.push({ title:'Weekend summary', html:
-    '<div class="head"><div class="name">Summary of the Weekend</div><div class="choir">' + (last ? 'Week ' + last.wk + ' · ' + esc(last.label) : '') + '</div><div class="gov">All ' + n + ' CGs · Power of 2</div></div>' +
-    '<div class="kpis">' +
-      tile('Tuesday &amp; Friday FLOW', k != null ? (M.total(k,'tue') + ' / ' + M.total(k,'fri')) : '—', 'CGs present · Tue / Fri', 'var(--green)') +
-      tile('Meeting God Service', k != null ? M.total(k,'mgs') : '—', 'of ' + n + ' CGs present', 'var(--blue)') +
-      tile('Saturday Outreaches', k != null ? M.total(k,'out') : '—', 'souls won · ' + (k != null ? M.reported(k,'out') : 0) + ' CGs reported', 'var(--pink)') +
-      tile('Sunday Attendance', k != null ? M.total(k,'sun') : '—', 'people brought · ' + (k != null ? M.reported(k,'sun') : 0) + ' CGs reported', 'var(--sun)') +
-    '</div>' +
-    '<div class="govtbl"><table><thead><tr><th>Governor</th><th>CGs</th><th>Tue FLOW</th><th>Meeting God</th><th>Fri FLOW</th><th>Souls</th><th>Sunday</th></tr></thead><tbody>' +
-      Object.keys(byGov).map(function (g) { var x = byGov[g]; return '<tr><td>' + esc(g) + '</td><td>' + x.cgs + '</td><td>' + x.tue + '</td><td>' + x.mgs + '</td><td>' + x.fri + '</td><td>' + x.out + '</td><td>' + x.sun + '</td></tr>'; }).join('') +
-      '<tr class="total"><td>Total</td><td>' + n + '</td><td>' + (k != null ? M.total(k,'tue') : 0) + '</td><td>' + (k != null ? M.total(k,'mgs') : 0) + '</td><td>' + (k != null ? M.total(k,'fri') : 0) + '</td><td>' + (k != null ? M.total(k,'out') : 0) + '</td><td>' + (k != null ? M.total(k,'sun') : 0) + '</td></tr>' +
-    '</tbody></table></div>' });
+    '<div class="head"><div class="name">Summary of the Weekend</div><div class="choir">' + (last ? 'Week ' + last.wk + ' · ' + esc(last.label) : '') + '</div><div class="gov">' + n + ' CGs · ' + np + ' CHs</div></div>' +
+    '<div class="grp"><span class="pill">Attendance — each CH counted</span></div><div class="kpis three">' + ITEMS.slice(0, 3).map(tile).join('') + '</div>' +
+    '<div class="grp g2"><span class="pill">Reported by each CG</span></div><div class="kpis two">' + ITEMS.slice(3).map(tile).join('') + '</div>' });
+
+  // ---- Page 3: defaulters ----
+  function cgName(c) { return c.members.map(function (m) { return (m.name || '?').split(' ')[0]; }).join(' & '); }
+  slides.push({ title:'Defaulters', html:
+    '<div class="head"><div class="name">Defaulters</div><div class="choir">' + (last ? 'Week ' + last.wk + ' · ' + esc(last.label) : '') + '</div><div class="gov">CGs that did not report</div></div>' +
+    '<div class="defs">' + ITEMS.map(function (it) { var list = k == null ? M.cgs : M.defaulters(k, it.f);
+      return '<div class="def' + (list.length ? '' : ' ok') + '"><h4 style="color:' + it.c + '">' + it.lab + '<span>' + (list.length ? list.length + ' of ' + n : 'all reported ✓') + '</span></h4>' +
+        (list.length ? '<ul>' + list.map(function (c) { return '<li><b>' + c.cg + '</b> ' + esc(cgName(c)) + '</li>'; }).join('') + '</ul>' : '') + '</div>'; }).join('') + '</div>' });
 
   // ---- Page 3+: one per CG ----
   M.cgs.forEach(function (c, i) {
     var out = W.map(function (w) { return M.get(c.cg, w.key, 'out'); }), sun = W.map(function (w) { return M.get(c.cg, w.key, 'sun'); });
-    function cnt(f) { return W.filter(function (w) { return M.get(c.cg, w.key, f) === true; }).length; }
-    var rows = W.map(function (w) { return '<tr><td class="w">WK ' + w.wk + ' · ' + esc(w.label) + '</td><td>' + tick(M.get(c.cg, w.key, 'tue')) + '</td><td>' + tick(M.get(c.cg, w.key, 'mgs')) + '</td><td>' + tick(M.get(c.cg, w.key, 'fri')) + '</td></tr>'; }).join('');
+    var mem = c.members.filter(function (m) { return m.ch; }), EV = ['tue', 'mgs', 'fri'];
+    function first(m) { return esc((m.name || '').split(' ')[0]); }
+    var rows = W.map(function (w) { return '<tr><td class="w">WK ' + w.wk + ' · ' + esc(w.label) + '</td>' + EV.map(function (f) {
+      return mem.map(function (m, mi) { return '<td class="' + (mi === 0 ? 'first' : 'second') + '">' + tick(M.person(c.cg, w.key, f, m.ch)) + '</td>'; }).join(''); }).join('') + '</tr>'; }).join('');
+    function cntP(f, ch) { return W.filter(function (w) { return M.person(c.cg, w.key, f, ch) === true; }).length; }
+    var head2 = EV.map(function () { return mem.map(function (m, mi) { return '<th class="' + (mi === 0 ? 'first' : 'second') + ' sub">' + first(m) + '</th>'; }).join(''); }).join('');
+    var totals = EV.map(function (f) { return mem.map(function (m, mi) { return '<td class="tot ' + (mi === 0 ? 'first' : 'second') + '">' + cntP(f, m.ch) + ' / ' + W.length + '</td>'; }).join(''); }).join('');
     slides.push({ title:c.cg + ' · ' + c.members.map(function (m) { return m.name || '?'; }).join(' & '), html:
       personCard(c.members[0], 'l') + personCard(c.members[1], 'r') +
       '<div class="head"><div class="name">Power of 2</div><div class="choir">' + esc(c.cg) + '</div><div class="gov">Governor: ' + esc(c.governor) + '</div></div>' +
@@ -112,8 +132,8 @@ P2.load(function (M) {
         '<div class="graph"><div class="cap"><span class="pill">Saturday Outreaches</span><span class="legend"><span><i class="sw" style="background:var(--pink)"></i> Souls won</span></span></div><div class="area"><canvas id="o' + i + '"></canvas></div></div>' +
         '<div class="graph"><div class="cap"><span class="pill">Sunday Attendance</span><span class="legend"><span><i class="sw" style="background:var(--sun)"></i> People brought</span></span></div><div class="area"><canvas id="s' + i + '"></canvas></div></div>' +
       '</div>' +
-      '<div class="flow"><table><thead><tr><th>Week</th><th>Tuesday FLOW</th><th>Meeting God Service</th><th>Friday FLOW</th></tr></thead><tbody>' + rows +
-        '<tr class="total"><td class="w">Total</td><td class="tot">' + cnt('tue') + ' / ' + W.length + '</td><td class="tot">' + cnt('mgs') + ' / ' + W.length + '</td><td class="tot">' + cnt('fri') + ' / ' + W.length + '</td></tr></tbody></table></div>',
+      '<div class="flow"><table><thead><tr><th rowspan="2">Week</th><th colspan="' + mem.length + '" class="grpth">Tuesday FLOW</th><th colspan="' + mem.length + '" class="grpth">Meeting God Service</th><th colspan="' + mem.length + '" class="grpth">Friday FLOW</th></tr><tr>' + head2 + '</tr></thead><tbody>' + rows +
+        '<tr class="total"><td class="w">Total</td>' + totals + '</tr></tbody></table></div>',
       draw:function () { charts.push(bar(document.getElementById('o' + i), labels, out, '#e2574c')); charts.push(bar(document.getElementById('s' + i), labels, sun, '#f5c518')); } });
   });
 
