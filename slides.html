@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Power of 2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=2">
-  <script src="config.js?v=2"></script><script src="roster.js?v=2"></script><script src="data.js?v=2"></script>
+  <link rel="stylesheet" href="style.css?v=3">
+  <script src="config.js?v=3"></script><script src="roster.js?v=3"></script><script src="data.js?v=3"></script>
 </head>
 <body>
   <div class="deck" id="deck"></div>
@@ -53,13 +53,15 @@ P2.load(function (M) {
   var deck = document.getElementById('deck'), slides = [], charts = [];
   var W = M.weeks, labels = W.map(function (w) { return 'WK ' + w.wk; }), last = W[W.length - 1];
 
-  // ---- Page 1: stage counting ----
+  // ---- Page 1: stage counting (Ushers Count) ----
   var S = window.STAGE || {};
   var pics = (S.photos || []).slice(0, 6).map(function (p) { return '<img src="' + esc(p) + '" onerror="this.outerHTML=\'<div class=ph>picture</div>\'">'; });
   while (pics.length < 3) pics.push('<div class="ph">picture</div>');
+  var lines = (S.counts || []).map(function (c) { return '<div class="line"><span class="sq y"></span><span class="lab">' + esc(c.label) + ':</span><span class="v">' + esc(c.value) + '</span></div>'; }).join('');
   slides.push({ title:'Stage counting', html:
-    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">' + esc(S.week || '') + '</div></div>' +
-    '<div class="stage"><div class="big"><div class="n">' + esc(S.count != null ? S.count : '—') + '</div><div class="t">counted on stage' + (S.note ? ' · ' + esc(S.note) : '') + '</div></div>' +
+    '<div class="head"><div class="name">Stage Counting on Sunday</div><div class="choir">' + esc(S.title || 'Ushers Count') + ' · ' + esc(S.date || '') + '</div></div>' +
+    '<div class="stage"><div class="counts">' + lines +
+      '<div class="line total"><span class="sq r"></span><span class="lab">TOTAL:</span><span class="v">' + esc(S.total != null ? S.total : '—') + '</span></div></div>' +
     '<div class="pics">' + pics.join('') + '</div></div>' });
 
   // ---- Page 2: weekend summary ----

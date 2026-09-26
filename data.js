@@ -2,10 +2,11 @@
 
 /* ---- Page 1: typed by hand each week ---- */
 window.STAGE = {
-  week: 'Sunday 20 Sep 2026',
-  count: 118,                       // people counted on stage
-  note: 'Experience Service',
-  photos: [ 'photos/stage-1.jpg', 'photos/stage-2.jpg', 'photos/stage-3.jpg' ]   // up to 6 pictures
+  title: 'Ushers Count',
+  date: '20th September 2026',
+  counts: [ { label: 'Podcast', value: 572 }, { label: 'Salvation', value: 406 } ],   // add more lines if the count changes
+  total: 978,
+  photos: [ 'photos/stage-1.jpg', 'photos/stage-2.jpg', 'photos/stage-3.jpg' ]   // up to 6 on-stage pictures
 };
 
 window.P2 = (function () {
